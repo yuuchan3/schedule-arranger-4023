@@ -1,15 +1,15 @@
-const { Hono } = require('hono');
-const { html } = require('hono/html');
-const layout = require('../layout');
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient({ log: ['query'] });
+const { Hono } = require("hono");
+const { html } = require("hono/html");
+const layout = require("../layout");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient({ log: ["query"] });
 
-const dayjs = require('dayjs');
-const utc = require('dayjs/plugin/utc');
-const timezone = require('dayjs/plugin/timezone');
+const dayjs = require("dayjs");
+const utc = require("dayjs/plugin/utc");
+const timezone = require("dayjs/plugin/timezone");
 dayjs.extend(utc);
 dayjs.extend(timezone);
-dayjs.tz.setDefault('Asia/Tokyo');
+dayjs.tz.setDefault("Asia/Tokyo");
 
 const app = new Hono();
 
@@ -36,16 +36,16 @@ function scheduleTable(schedules) {
   `;
 }
 
-app.get('/', async (c) => {
-  const { user } = c.get('session') ?? {};
+app.get("/", async (c) => {
+  const { user } = c.get("session") ?? {};
   const schedules = user
     ? await prisma.schedule.findMany({
       where: { createdBy: user.id },
-      orderBy: { updatedAt: 'desc' },
+      orderBy: { updatedAt: "desc" },
     })
     : [];
   schedules.forEach((schedule) => {
-    schedule.formattedUpdatedAt = dayjs(schedule.updatedAt).tz().format('YYYY/MM/DD HH:mm');
+    schedule.formattedUpdatedAt = dayjs(schedule.updatedAt).tz().format("YYYY/MM/DD HH:mm");
   });
 
   return c.html(
@@ -71,10 +71,10 @@ app.get('/', async (c) => {
                       <h3 class="my-3">あなたの作った予定一覧</h3>
                       ${scheduleTable(schedules)}
                     `
-                  : ''}
+                  : ""}
               </div>
             `
-          : ''}
+          : ""}
       `,
     ),
   );

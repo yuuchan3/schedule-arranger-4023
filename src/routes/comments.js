@@ -1,23 +1,22 @@
-const { Hono } = require('hono');
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient({ log: ['query'] });
-const ensureAuthenticated = require('../middlewares/ensure-authenticated');
-const { z } = require('zod');
-const { zValidator } = require('@hono/zod-validator');
-const { error } = require('jquery');
+const { Hono } = require("hono");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient({ log: ["query"] });
+const ensureAuthenticated = require("../middlewares/ensure-authenticated");
+const { z } = require("zod");
+const { zValidator } = require("@hono/zod-validator");
 
 const app = new Hono();
 
 const paramValidator = zValidator(
-  'param',
+  "param",
   z.object({
-    scheduleId: z.string().uuid,
+    scheduleId: z.string().uuid(),
     userId: z.coerce.number().int().min(0),
   }),
   (result, c) => {
     if (!result.success) {
       return c.json({
-        status: 'NG',
+        status: "NG",
         errors: [result.error],
       }, 400);
     }
@@ -25,14 +24,14 @@ const paramValidator = zValidator(
 );
 
 const jsonValidator = zValidator(
-  'json',
+  "json",
   z.object({
     comment: z.string().min(1).max(255),
   }),
   (result, c) => {
     if (!result.success) {
       return c.json({
-        status: 'NG',
+        status: "NG",
         errors: [result.error],
       }, 400);
     }
@@ -40,22 +39,21 @@ const jsonValidator = zValidator(
 );
 
 app.post(
-  '/:scheduleId/users/:userId/comments',
+  "/:scheduleId/users/:userId/comments",
   ensureAuthenticated(),
   paramValidator,
   jsonValidator,
   async (c) => {
-    const { scheduleId, userId } = c.req.valid('param');
-    const { comment } = c.req.valid('json');
+    const { scheduleId, userId } = c.req.valid("param");
+    const { comment } = c.req.valid("json");
 
-    const { user } = c.get('session') ?? {};
+    const { user } = c.get("session") ?? {};
     if (user?.id !== userId) {
       return c.json({
-        status: 'NG',
-        errors: [{ msg: 'ユーザ ID が不正です。' }],
+        status: "NG",
+        errors: [{ msg: "ユーザー ID が不正です。" }],
       }, 403);
     }
-
 
     const data = {
       userId,
@@ -76,12 +74,13 @@ app.post(
       });
     } catch (error) {
       console.error(error);
-      return c.json({
-        status: 'NG',
-        errors: [{ msg: 'データベース エラー。' }],
+      return c.json({ 
+        status: "NG",
+        errors: [{ msg: "データベース エラー。" }],
       }, 500);
     }
-    return c.json({ status: 'OK', comment });
+
+    return c.json({ status: "OK", comment });
   },
 );
 

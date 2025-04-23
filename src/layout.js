@@ -1,8 +1,8 @@
-const { html } = require('hono/html');
+const { html } = require("hono/html");
 
 function layout(c, title, body) {
-  const { user } = c.get('session') ?? {};
-  title = title ? `${title} - 予定調整くん` : '予定調整くん';
+  const { user } = c.get("session") ?? {};
+  title = title ? `${title} - 予定調整くん` : "予定調整くん";
   return html`
     <!doctype html>
     <html>
